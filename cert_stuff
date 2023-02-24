@@ -54,13 +54,25 @@ openssl req -new -out gitlab.csr -newkey rsa:4096 -nodes -sha256 -keyout gitlab.
 
 ll /path/to/ssl/
 
-#give gitlab.csr (pub key) to CA to sign and to generate certificate (gitlab.crt)
+#give gitlab.csr (pub key) to CA to sign and to generate certificate (gitlab.crt). Download the Base 64 encoded cert.
+#If the CA is gives you a .cer file you may change the file extension to .crt 
+#Because .cer and .crt files are basically synonymous, they can be used interchangeably by simply changing the extension.
 
-#can then create a .pem with gitlab.crt and the rest of the key chain and add it to the trust store (root at top and go down the chain)
+#you can then create a .pem with gitlab.crt and the rest of the key chain and add it to the trust store (root at top and go down the chain)
 #for gitlab's example
 
-cp -p gitlab.pem /etc/gitlab/trusted-certs
+#vi gitlab.crt 
+#copy the contents of gitlab.crt and then paste it into a new .pem file (ex. gitlab.pem). Place the gitlab.pem file into /etc/gitlab/trusted-certs/ dir
 
+cp -p gitlab.crt /etc/gitlab/trusted-certs/gitlab.pem
+
+#make sure you change the file paths in /etc/gitlab/gitlab.rb file
+#nginx['ssl_certificate'] = "/etc/gitlab/ssl/gitlab.crt"
+#nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/gitlab.key"
+#mattermost_nginx['ssl_certificate'] = "/etc/gitlab/ssl/gitlab.crt"
+#mattermost_nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/gitlab.key"
+
+#then run the following command
 gitlab-ctl reconfigure
 
 ####miscellaneous
